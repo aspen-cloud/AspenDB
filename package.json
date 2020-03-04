@@ -1,6 +1,6 @@
 {
   "name": "@aspen.cloud/aspendb",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Your unified, personal database to store data for many applications. ",
   "main": "index.js",
   "scripts": {
