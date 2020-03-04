@@ -1,6 +1,7 @@
 import PouchDB from "pouchdb";
 
 PouchDB.plugin(require("pouchdb-adapter-node-websql"));
+PouchDB.plugin(require("pouchdb-find"));
 const { getDataHome } = require("platform-folders");
 const appDirectory = `${getDataHome()}/aspen/`;
 

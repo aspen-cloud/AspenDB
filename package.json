@@ -38,6 +38,7 @@
     "platform-folders": "^0.4.1",
     "pouchdb": "^7.2.1",
     "pouchdb-adapter-node-websql": "^7.0.0",
+    "pouchdb-find": "^7.2.1",
     "tslib": "^1"
   },
   "devDependencies": {
