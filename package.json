@@ -1,8 +1,8 @@
 {
   "name": "@aspen.cloud/aspendb",
-  "version": "0.2.0",
+  "version": "0.1.1",
   "description": "Your unified, personal database to store data for many applications. ",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -37,7 +37,8 @@
     "@types/pouchdb": "^6.4.0",
     "platform-folders": "^0.4.1",
     "pouchdb": "^7.2.1",
-    "pouchdb-adapter-node-websql": "^7.0.0"
+    "pouchdb-adapter-node-websql": "^7.0.0",
+    "tslib": "^1"
   },
   "devDependencies": {
     "typescript": "^3.8.3"
