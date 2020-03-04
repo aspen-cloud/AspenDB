@@ -1,17 +1,17 @@
-import PouchDB from 'pouchdb';
+import PouchDB from "pouchdb";
 
-PouchDB.plugin(require('pouchdb-adapter-node-websql'));
-const { getDataHome } = require('platform-folders');
+PouchDB.plugin(require("pouchdb-adapter-node-websql"));
+const { getDataHome } = require("platform-folders");
 const appDirectory = `${getDataHome()}/aspen/`;
 
 export default class AspenDB {
   app: string;
   db: PouchDB.Database;
 
-  static localDBPath = appDirectory + 'aspen_local.db';
+  static localDBPath = appDirectory + "aspen_local.db";
 
   constructor(appName: string) {
-    this.db = new PouchDB(AspenDB.localDBPath, { adapter: 'websql' });
+    this.db = new PouchDB(AspenDB.localDBPath, { adapter: "websql" });
     this.app = appName;
   }
 
@@ -20,13 +20,11 @@ export default class AspenDB {
   }
 
   async addAll(docs: Array<object>) {
-    return this.db.bulkDocs(
-      docs.map(doc => ({ ...docs, aspen_app: this.app }))
-    );
+    return this.db.bulkDocs(docs.map(doc => ({ ...doc, aspen_app: this.app })));
   }
 
-  async all(fullDocs = false) {
-    const { rows } = await this.db.allDocs({ include_docs: fullDocs });
+  async all(options: any) {
+    const { rows } = await this.db.allDocs(options);
     return rows;
   }
 
@@ -34,4 +32,3 @@ export default class AspenDB {
     return this.db.find(query);
   }
 }
-
