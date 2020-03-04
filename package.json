@@ -1,0 +1,43 @@
+{
+  "name": "@aspen.cloud/aspendb",
+  "version": "0.1.0",
+  "description": "Your unified, personal database to store data for many applications. ",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepack": "rm -rf lib && tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aspen-cloud/aspendb.git"
+  },
+  "keywords": [
+    "database",
+    "sqllite",
+    "api",
+    "personal",
+    "private",
+    "couchdb",
+    "pouchdb",
+    "aspen",
+    "cloud"
+  ],
+  "files": [
+    "lib/**/*"
+  ],
+  "author": "Matthew Linkous <matthew.linkous@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/aspen-cloud/aspendb/issues"
+  },
+  "homepage": "https://github.com/aspen-cloud/aspendb#readme",
+  "dependencies": {
+    "platform-folders": "^0.4.1",
+    "pouchdb": "^7.2.1",
+    "pouchdb-adapter-node-websql": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  }
+}
