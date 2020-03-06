@@ -44,13 +44,17 @@ export default class AspenDB {
     return this.db.bulkDocs(docs.map(doc => this.addIdToDoc(doc)));
   }
 
-  async all(type?: string) {
+  async all({
+    type,
+    fullDocs = false,
+  }: { type?: string; fullDocs?: boolean } = {}) {
     const indexArray = type ? [this.app, type] : [this.app];
     const startkey = collate.toIndexableString(indexArray);
     const endkey = collate.toIndexableString([...indexArray, "\ufff0"]);
     const { rows } = await this.db.allDocs({
       startkey,
       endkey,
+      include_docs: fullDocs,
     });
     return rows;
   }

@@ -89,9 +89,9 @@ describe("Correctly scopes to types", () => {
   });
 
   it("should return just the type of doc requested", async () => {
-    const numDocs = await db1.all("num");
+    const numDocs = await db1.all({ type: "num" });
     expect(numDocs.length).to.equal(2);
-    const msgDocs = await db1.all("msg");
+    const msgDocs = await db1.all({ type: "msg" });
     expect(msgDocs.length).to.equal(1);
   });
 });
