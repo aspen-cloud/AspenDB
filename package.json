@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha -r ts-node/register test/**/*.test.ts",
     "prepack": "rm -rf lib && tsc -b"
   },
   "repository": {
@@ -38,10 +38,18 @@
     "platform-folders": "^0.4.1",
     "pouchdb": "^7.2.1",
     "pouchdb-adapter-node-websql": "^7.0.0",
+    "pouchdb-collate": "^7.2.1",
     "pouchdb-find": "^7.2.1",
+    "shortid": "^2.2.15",
     "tslib": "^1"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.10",
+    "@types/mocha": "^7.0.2",
+    "chai": "^4.2.0",
+    "mocha": "^7.1.0",
+    "pouchdb-adapter-memory": "^7.2.1",
+    "ts-node": "^8.6.2",
     "typescript": "^3.8.3"
   }
 }
