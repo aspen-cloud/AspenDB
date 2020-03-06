@@ -1,5 +1,6 @@
 import PouchDB from "pouchdb";
 PouchDB.plugin(require("pouchdb-find"));
+PouchDB.plugin(require("pouchdb-upsert"));
 const { getDataHome } = require("platform-folders");
 const appDirectory = `${getDataHome()}/aspen/`;
 const collate = require("pouchdb-collate");
@@ -23,13 +24,13 @@ export default class AspenDB {
   }
 
   async add(doc: iInsertableDoc, type?: string) {
-    return this.db.put(this.addIdToDoc(doc, type));
+    return this.db.putIfNotExists(this.addIdToDoc(doc, type));
   }
 
-  private async addIdToDoc(
+  private addIdToDoc(
     doc: iInsertableDoc,
     type?: string,
-  ): Promise<{ _id: string; [key: string]: any }> {
+  ): { _id: string; [key: string]: any } {
     const docId = doc.id || shortid.generate();
     const docType = type || doc.type;
     const indexableAttributes = docType

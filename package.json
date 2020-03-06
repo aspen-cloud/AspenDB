@@ -35,11 +35,13 @@
   "dependencies": {
     "@types/node": "^13.7.7",
     "@types/pouchdb": "^6.4.0",
+    "@types/pouchdb-upsert": "^2.2.6",
     "platform-folders": "^0.4.1",
     "pouchdb": "^7.2.1",
     "pouchdb-adapter-node-websql": "^7.0.0",
     "pouchdb-collate": "^7.2.1",
     "pouchdb-find": "^7.2.1",
+    "pouchdb-upsert": "^2.2.0",
     "shortid": "^2.2.15",
     "tslib": "^1"
   },

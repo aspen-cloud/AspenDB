@@ -16,6 +16,39 @@ async function resetDB() {
   db2 = new AspenDB(pouchdb, "app2");
 }
 
+describe("Multiple adds and one addAll are equivalent", () => {
+  let db1Mirror: AspenDB;
+  let seedDocs = [
+    { val: 123, id: "testId" },
+    { val: "test" },
+    { field: [1, 2, 3], id: "123", type: "arr" },
+  ];
+  before(async () => {
+    await resetDB();
+    db1Mirror = new AspenDB(pouchdb, "app1");
+
+    await Promise.all([
+      db1.addAll(seedDocs),
+      ...seedDocs.map(doc => db1Mirror.add(doc)),
+    ] as Promise<any>[]);
+  });
+
+  it("should upsert when id is present and produce new ids when not", async () => {
+    const masterDocs = await pouchdb.allDocs();
+    const numDocsWithIds = seedDocs.filter(doc => !!doc.id).length;
+    const numDocsWithoutIds = seedDocs.length - numDocsWithIds;
+    expect(masterDocs.rows.length).to.equal(
+      numDocsWithIds + 2 * numDocsWithoutIds,
+    );
+  });
+
+  it("should produce equivalent docs", async () => {
+    const docs1 = await db1.all();
+    const docs2 = await db1Mirror.all();
+    expect(docs1).to.eql(docs2); // Note: eql does a deep comparison
+  });
+});
+
 describe("Has properly scoped documents and indexes", () => {
   const db1Docs = [{ val: 123 }, { val: "test" }];
   const db2Docs = [{ val: 123 }, { val: "test" }, { val: 456 }];
@@ -42,7 +75,7 @@ describe("Has properly scoped documents and indexes", () => {
   });
 });
 
-describe("correctly scopes to types", () => {
+describe("Correctly scopes to types", () => {
   before(async () => {
     await resetDB();
     //seed db
