@@ -1,10 +1,8 @@
 import PouchDB from "pouchdb";
 PouchDB.plugin(require("pouchdb-find"));
 PouchDB.plugin(require("pouchdb-upsert"));
-const { getDataHome } = require("platform-folders");
-const appDirectory = `${getDataHome()}/aspen/`;
 const collate = require("pouchdb-collate");
-const shortid = require("shortid");
+import shortid from "shortid";
 
 interface iInsertableDoc {
   id?: string;
@@ -13,18 +11,36 @@ interface iInsertableDoc {
 }
 
 export default class AspenDB {
-  app: string;
   db: PouchDB.Database;
 
-  static localDBPath = appDirectory + "aspen_local.db";
-
-  constructor(db: PouchDB.Database<{}>, appName: string) {
+  constructor(db: PouchDB.Database<{}>) {
     this.db = db;
-    this.app = appName;
+  }
+
+  app(appId: string) {
+    return new AspenAppScope(this.db, appId);
+  }
+}
+
+export class AspenAppScope {
+  global: PouchDB.Database;
+  appId: string;
+
+  constructor(global: PouchDB.Database<{}>, appId: string) {
+    this.global = global;
+    this.appId = appId;
   }
 
   async add(doc: iInsertableDoc, type?: string) {
-    return this.db.putIfNotExists(this.addIdToDoc(doc, type));
+    return this.global.putIfNotExists(this.addIdToDoc(doc, type));
+  }
+
+  private createFullId(id: string, docType?: string) {
+    const indexableAttributes = docType
+      ? [this.appId, docType, id]
+      : [this.appId, id];
+
+    return collate.toIndexableString(indexableAttributes);
   }
 
   private addIdToDoc(
@@ -33,25 +49,23 @@ export default class AspenDB {
   ): { _id: string; [key: string]: any } {
     const docId = doc.id || shortid.generate();
     const docType = type || doc.type;
-    const indexableAttributes = docType
-      ? [this.app, docType, docId]
-      : [this.app, docId];
-    const fullId = collate.toIndexableString(indexableAttributes);
+    const fullId = this.createFullId(docId, docType);
+
     return { ...doc, _id: fullId };
   }
 
   async addAll(docs: Array<object>) {
-    return this.db.bulkDocs(docs.map(doc => this.addIdToDoc(doc)));
+    return this.global.bulkDocs(docs.map(doc => this.addIdToDoc(doc)));
   }
 
   async all({
     type,
     fullDocs = false,
   }: { type?: string; fullDocs?: boolean } = {}) {
-    const indexArray = type ? [this.app, type] : [this.app];
+    const indexArray = type ? [this.appId, type] : [this.appId];
     const startkey = collate.toIndexableString(indexArray);
     const endkey = collate.toIndexableString([...indexArray, "\ufff0"]);
-    const { rows } = await this.db.allDocs({
+    const { rows } = await this.global.allDocs({
       startkey,
       endkey,
       include_docs: fullDocs,
@@ -60,6 +74,24 @@ export default class AspenDB {
   }
 
   async find(query: PouchDB.Find.FindRequest<{}>) {
-    return this.db.find(query);
+    return this.global.find(query);
+  }
+
+  async putIndex(index: { fields: string[]; name?: string }) {
+    return this.global.createIndex({
+      index: { ...index, ddoc: this.appId, type: "json" },
+    });
+  }
+
+  async get(id: string) {
+    return this.global.get(this.createFullId(id));
+  }
+
+  async upsert(id: string, diffFunc: (prevDoc: any) => false | {}) {
+    return this.global.upsert(this.createFullId(id), diffFunc);
+  }
+
+  async putIfNotExits(doc: { _id: string }) {
+    return this.global.putIfNotExists(doc);
   }
 }

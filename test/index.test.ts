@@ -1,23 +1,23 @@
 import { expect } from "chai";
 import "mocha";
 import PouchDB from "pouchdb";
-import AspenDB from "../src/aspendb";
+import AspenDB, { AspenAppScope } from "../src/aspendb";
 
 PouchDB.plugin(require("pouchdb-adapter-memory"));
 
 let pouchdb = new PouchDB("test", { adapter: "memory" });
-let db1 = new AspenDB(pouchdb, "app1");
-let db2 = new AspenDB(pouchdb, "app2");
+let db1 = new AspenDB(pouchdb).app("app1");
+let db2 = new AspenDB(pouchdb).app("app2");
 
 async function resetDB() {
   await pouchdb.destroy();
   pouchdb = new PouchDB("test", { adapter: "memory" });
-  db1 = new AspenDB(pouchdb, "app1");
-  db2 = new AspenDB(pouchdb, "app2");
+  db1 = new AspenDB(pouchdb).app("app1");
+  db2 = new AspenDB(pouchdb).app("app2");
 }
 
 describe("Multiple adds and one addAll are equivalent", () => {
-  let db1Mirror: AspenDB;
+  let db1Mirror: AspenAppScope;
   let seedDocs = [
     { val: 123, id: "testId" },
     { val: "test" },
@@ -25,7 +25,7 @@ describe("Multiple adds and one addAll are equivalent", () => {
   ];
   before(async () => {
     await resetDB();
-    db1Mirror = new AspenDB(pouchdb, "app1");
+    db1Mirror = new AspenDB(pouchdb).app("app1");
 
     await Promise.all([
       db1.addAll(seedDocs),
@@ -54,7 +54,7 @@ describe("Has properly scoped documents and indexes", () => {
   const db2Docs = [{ val: 123 }, { val: "test" }, { val: 456 }];
   before(async () => {
     await resetDB();
-    //Seed databases
+    // Seed databases
     const db1Inserts = db1Docs.map(doc => db1.add(doc));
     const db2Inserts = db2Docs.map(doc => db2.add(doc));
     await Promise.all([...db1Inserts, ...db2Inserts]);
@@ -78,7 +78,7 @@ describe("Has properly scoped documents and indexes", () => {
 describe("Correctly scopes to types", () => {
   before(async () => {
     await resetDB();
-    //seed db
+    // Seed db
     const db1Docs = [
       { val: 123, type: "num" },
       { val: 456, type: "num" },
@@ -93,5 +93,35 @@ describe("Correctly scopes to types", () => {
     expect(numDocs.length).to.equal(2);
     const msgDocs = await db1.all({ type: "msg" });
     expect(msgDocs.length).to.equal(1);
+  });
+});
+
+describe("Has app-scoped indexes", () => {
+  const db1Docs = [{ name: "John" }, { name: "Sally" }, { val: "Thomas" }];
+  const db2Docs = [{ val: 123 }, { val: "test" }, { val: 456 }];
+
+  const nameViewId = "byName";
+
+  before(async () => {
+    await resetDB();
+    // Seed databases
+    const db1Inserts = db1Docs.map(doc => db1.add(doc));
+    const db2Inserts = db2Docs.map(doc => db2.add(doc));
+    await Promise.all([...db1Inserts, ...db2Inserts]);
+  });
+
+  it("correctly adds index to app's design documents", async () => {
+    await db1.putIndex({ fields: ["name"], name: nameViewId });
+
+    const { indexes } = await db1.global.getIndexes();
+    const newIndex = indexes.find(indx => indx.name === nameViewId);
+    expect(newIndex).to.not.be.null;
+    expect(newIndex?.name).to.equal(nameViewId);
+    expect(newIndex?.ddoc).to.include(db1.appId);
+  });
+
+  it("is queryable", async () => {
+    const result = await db1.find({ selector: { name: { $exists: true } } });
+    expect(result.docs.length).to.equal(2);
   });
 });

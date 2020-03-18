@@ -1,12 +1,15 @@
 import PouchDB from "pouchdb";
-import AspenDB from "./aspendb";
-import { DefaultDeserializer } from "v8";
+import AspenDB, { AspenAppScope } from "./aspendb";
 
 PouchDB.plugin(require("pouchdb-adapter-node-websql"));
 
+const { getDataHome } = require("platform-folders");
+const appDirectory = `${getDataHome()}/aspen/`;
+const localDBPath = appDirectory + "aspen_local.db";
+
 const LocalAspenDB = AspenDB.bind(
   null,
-  new PouchDB(AspenDB.localDBPath, { adapter: "websql" }),
+  new PouchDB(localDBPath, { adapter: "websql" }),
 );
 
-export { LocalAspenDB as default, AspenDB };
+export { LocalAspenDB as default, AspenDB, AspenAppScope };

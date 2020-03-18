@@ -36,6 +36,7 @@
     "@types/node": "^13.7.7",
     "@types/pouchdb": "^6.4.0",
     "@types/pouchdb-upsert": "^2.2.6",
+    "@types/shortid": "0.0.29",
     "platform-folders": "^0.4.1",
     "pouchdb": "^7.2.1",
     "pouchdb-adapter-node-websql": "^7.0.0",
