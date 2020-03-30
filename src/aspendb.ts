@@ -87,7 +87,7 @@ export class AspenAppScope {
     return this.global.get(this.createFullId(id));
   }
 
-  async upsert(id: string, diffFunc: (prevDoc: {}) => false | {}) {
+  async upsert(id: string, diffFunc: PouchDB.UpsertDiffCallback<Object>) {
     return this.global.upsert(this.createFullId(id), diffFunc);
   }
 
