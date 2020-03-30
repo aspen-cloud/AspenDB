@@ -64,7 +64,7 @@ export class AspenAppScope {
   }: { type?: string; fullDocs?: boolean } = {}) {
     const indexArray = type ? [this.appId, type] : [this.appId];
     const startkey = collate.toIndexableString(indexArray);
-    const endkey = collate.toIndexableString([...indexArray, "\ufff0"]);
+    const endkey = collate.toIndexableString(indexArray) + "\ufff0";
     const { rows } = await this.global.allDocs({
       startkey,
       endkey,
@@ -87,7 +87,7 @@ export class AspenAppScope {
     return this.global.get(this.createFullId(id));
   }
 
-  async upsert(id: string, diffFunc: (prevDoc: any) => false | {}) {
+  async upsert(id: string, diffFunc: (prevDoc: {}) => false | {}) {
     return this.global.upsert(this.createFullId(id), diffFunc);
   }
 
