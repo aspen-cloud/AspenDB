@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "test": "mocha -r ts-node/register test/**/*.test.ts",
-    "prepack": "rm -rf lib && tsc -b"
+    "prepack": "npm run test && rm -rf lib && tsc -b"
   },
   "repository": {
     "type": "git",
