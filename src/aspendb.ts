@@ -40,7 +40,10 @@ export class AspenAppScope {
       ? [this.appId, docType, id]
       : [this.appId, id];
 
-    return collate.toIndexableString(indexableAttributes);
+    // TODO Use custom fork of collate or make helper function
+    return collate
+      .toIndexableString(indexableAttributes)
+      .replace(/\u0000/g, "\u0001");
   }
 
   private addIdToDoc(
@@ -63,8 +66,12 @@ export class AspenAppScope {
     fullDocs = false,
   }: { type?: string; fullDocs?: boolean } = {}) {
     const indexArray = type ? [this.appId, type] : [this.appId];
-    const startkey = collate.toIndexableString(indexArray);
-    const endkey = collate.toIndexableString(indexArray) + "\ufff0";
+    const startkey = collate
+      .toIndexableString(indexArray)
+      .replace(/\u0000/g, "\u0001");
+    const endkey =
+      collate.toIndexableString(indexArray).replace(/\u0000/g, "\u0001") +
+      "\ufff0";
     const { rows } = await this.global.allDocs({
       startkey,
       endkey,
