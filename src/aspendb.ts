@@ -69,9 +69,10 @@ export class AspenAppScope {
     const startkey = collate
       .toIndexableString(indexArray)
       .replace(/\u0000/g, "\u0001");
-    const endkey =
-      collate.toIndexableString(indexArray).replace(/\u0000/g, "\u0001") +
-      "\ufff0";
+    const endkey = collate
+      .toIndexableString([...indexArray, "\ufff0"])
+      .replace(/\u0000/g, "\u0001");
+
     const { rows } = await this.global.allDocs({
       startkey,
       endkey,
